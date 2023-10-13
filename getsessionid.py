@@ -25,60 +25,60 @@ def get_sessionid(driver : webdriver.Chrome):
         driver.get('https://consulat.gouv.fr/en/ambassade-de-france-a-nicosie/appointment?name=Visa')
 
         sleep(2.5)
-
+        # Берем код страницы
         source = driver.page_source
         
         soup = BeautifulSoup(source, 'lxml')
-
+        # Ищем изображение
         image = soup.find('img', id='captcha-image')['src']
 
         mdriver.get(image)
-        
+        # Достаем исходный файл
         req = mdriver.page_source
-        
+        # Записываем его
         with open('image.svg', 'w') as file:
             file.write(req)
-        # Здесь будем решать капчу
-        
+        # Конвертируем svg в png
         cairosvg.svg2png(url='image.svg', write_to='output.png')
-        
+        # Решаем капчу
         result = solver.normal('output.png')
-        
+        # Вводим капчу в поле
         input = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/main/div[2]/div/div/div/div/div[2]/div/div/div/div/div[2]/input')
         input.send_keys(result['code'])
-        
+        # Кликаем на кнопку, чтобы продолжить
         button = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/main/div[2]/div/div/div/div/div[3]/button')
         button.click()
     except:
-        get_sessionid(driver)
+        get_sessionid(driver) # Это на случай, если капча не решится
     
-    sleep(2.5)
-
+    sleep(2.5) # Все паузы нужны для прогрузки страницы. Если ваш интернет не успевает, то можете их сделать больше
+    # Здесь нажимаем на Demand de passeport 
     button = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/main/div[2]/div/div/div/div/div[3]/div/div[2]/fieldset/div/div[2]/div/div/button[2]')
     button.click()
-    
+    # Нажимаем на "To confirm"
     button = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/main/div[2]/div/div/div/div/div[3]/div/div[4]/button')
     button.click()
     
     sleep(2)
-    
+    # Подтверждаем, что прочитали что-то
     button = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/main/div[2]/div/div/div/div/div[3]/div[2]/div[2]/div/div[1]/div/label')
     button.click()
-    
+    # Нажимаем на "Book an appointment"
     button = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/main/div[2]/div/div/div/div/div[3]/div[2]/div[2]/div/div[2]/button')
     button.click()
     
     sleep(3.5)
     
+    # Выбираем время встречи
     button = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/main/div[2]/div/div/div/div/div[3]/div[2]/div[2]/div/div/div[1]/div/div/div/span')
-    
     button.click()
-    
+    # Нажимаем Validate the calendar
     button = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/main/div[2]/div/div/div/div/div[3]/div[2]/div[3]/button')
-    
     button.click()
     
     sleep(2.5)
+    
+    # Дальше мы вводим данные от полей
     
     input = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/main/div[2]/div/div/div/div/div[3]/div[1]/div[2]/div[1]/div/div/div[1]/input')
     input.send_keys('Bobrov')
@@ -109,6 +109,9 @@ def get_sessionid(driver : webdriver.Chrome):
     
     sleep(1.5)
     
+    # Здесь тоже нажимаем на подтверждение прочитанного
+    # Только здесь реализован отступ, чтобы не нажать на ссылку, которая ведет к документам
+    
     button = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/main/div[2]/div/div/div/div/div[3]/div[2]/div[2]/div/div/div[1]/div/label')
     
     element_size = button.size
@@ -119,11 +122,14 @@ def get_sessionid(driver : webdriver.Chrome):
     middle_y = element_location['y'] + element_size['height'] / 2
     actions = ActionChains(driver)
     actions.move_by_offset(left_x, middle_y)
-    actions.click()
-    actions.perform()
+    actions.click() 
+    actions.perform() # Кликаем
     
+    # Нажимаем "To confirm"
     button = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/main/div[2]/div/div/div/div/div[3]/div[2]/div[2]/div/div/div[2]/button[1]')
     button.click()
+    
+    # Готово
     
     
 def kernel():
@@ -140,6 +146,6 @@ def kernel():
 
     get_sessionid(driver)
     
-    sleep(5)
+    sleep(5) # Здесь потом можете поменять время в зависимости от вашего интернета
 
     print('Программа отработала успешно')
